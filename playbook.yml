@@ -1,13 +1,35 @@
 - hosts: localhost
   vars_files:
-   - files_list.yml
+     - files_list.yml
   tasks:
-   - name: check file checksum
-     stat:
-         path: "{{ item.name }}"
-     with_items:
-      - "{{ files }}"
-     register: xyz
+    - name: stat
+      stat:
+        path: "{{ item.name }}"
+      register: test
+      with_items: "{{ files }}"
+ 
+    - debug: 
+        msg: "{{ item.stat.checksum }}"
+      with_items: "{{ test.results }}"
 
-   - debug:
-        var: xyz
+
+    - debug:
+        msg: "{{ item.item.checksum }}"
+      with_items: "{{ test.results }}"
+
+    - debug:
+        msg: checksum matched
+      when: item.stat.checksum == item.item.checksum
+      with_items: "{{ test.results }}"
+
+    - debug:
+        msg: checksum not matched
+      when: item.stat.checksum != item.item.checksum
+      with_items: "{{ test.results }}"
+
+
+
+      
+
+
+
